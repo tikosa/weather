@@ -6,19 +6,30 @@
 // for convenience
 using json = nlohmann::json;
 
+const std::string yerevan_location_key = "16890";
+const std::string apikey = "TBD";
+
 template<typename T>
 struct TD;
 
 int main(int argc, char** argv) {
-    auto r = cpr::Get(cpr::Url{"http://www.httpbin.org/get"});
+
+    std::string url{"http://dataservice.accuweather.com/currentconditions/v1/"};
+    // auto r = cpr::Get(cpr::Url{"http://www.httpbin.org/get"});
     // auto r = cpr::Get(cpr::Url{"http://samples.openweathermap.org/data/2.5/weather?id=2172797&appid=b6907d289e10d714a6e88b30761fae22"});
-    std::cout << r.status_code << std::endl;;                  // 200
+    auto r = cpr::Get(cpr::Url{url + yerevan_location_key},
+                                cpr::Parameters{{"apikey", apikey}, 
+                                                {"language", "en-us"}});
+    std::cout << "status code: " << r.status_code << std::endl;;                  // 200
     // r.header["content-type"];       // application/json; charset=utf-8
-    std::cout << r.text << std::endl;;                         // JSON text string
-    //
-    // auto text_json = json::parse(r.text);
-    // auto main_section = text_json["main"];
-    // std::cout << main_section << std::endl;
+    // std::cout << r.text << std::endl;;                         // JSON text string
+
+    const std::string temperature{"Temperature"};
+    const std::string metric{"Metric"};
+
+    auto text_json = json::parse(r.text);
+    auto temperature_metric = text_json[0][temperature][metric];
+    std::cout << temperature_metric << std::endl;
 
     // std::string resp("{\"coord\":{\"lon\":-0.13,\"lat\":51.51},\"weather\":[{\"id\":300,\"main\":\"Drizzle\",\"description\":\"light intensity drizzle\",\"icon\":\"09d\"}],\"base\":\"stations\",\"main\":{\"temp\":280.32,\"pressure\":1012,\"humidity\":81,\"temp_min\":279.15,\"temp_max\":281.15},\"visibility\":10000,\"wind\":{\"speed\":4.1,\"deg\":80},\"clouds\":{\"all\":90},\"dt\":1485789600,\"sys\":{\"type\":1,\"id\":5091,\"message\":0.0103,\"country\":\"GB\",\"sunrise\":1485762037,\"sunset\":1485794875},\"id\":2643743,\"name\":\"London\",\"cod\":200}");
     //
